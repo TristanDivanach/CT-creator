@@ -27,6 +27,7 @@ for i in $CT
 	echo "CT$ID created"
 	pct start
 	"CT$ID started"
+	$ID=$ID+1
 
 
 
