@@ -1,34 +1,35 @@
 #!/bin/bash
 
-template="/var/lib/vz/dump/Tempalte_Debian.tar.zst"
+template="/var/lib/vz/dump/TemplateCT.tar.zst"
 
-echo "From which ID do you want to create containers" read ID
+read -p "From which ID do you want to create containers: " ID
 
-echo "How many containers do you want to create ?" read CT
+read -p "How many containers do you want to create: " CT
 
-echo "How many CPUs" read CPU
-echo "What amount of RAM(in MB | default - 512)" read RAM
-echo "Which storage ? (storage ID | default - local" read ROM
+read -p "How many CPUs: " CPU
+read -p "What amount of RAM(in MB | default - 512): " RAM
+RAM=${RAM:-512}
+read -p "Which storage ? (storage ID | default - local): " ROM
+ROM=${ROM:-local}
 
 #Network
-echo "Which IP address use ? (IPV4/CIDR)" read IP
-echo "which Gateway ?" read GW
+read -p "which Gateway: " GW
 
 
-echo "What password to you want to use" read PASSWD
-
-for i in $CT 
-	pct create $ID $template \
+for (( i=1; i<=$CT; i++ ))
+do
+	IP=192.168.1.$ID/24
+	echo "IP adress is $IP"
+	pct create $ID "$template" \
 		--cores $CPU \
 		--memory $RAM \
-		--storage $ROM \
-		--net $IP $Gw \
-		--password $PASSWD
+		--storage "$ROM" \
+		--net0 name=eth0,bridge=vmbr1,ip=$IP,gw=$GW
 	echo "CT$ID created"
-	pct start
-	"CT$ID started"
-	$ID=$ID+1
-
+	pct start $ID
+	echo "CT$ID started"
+	((ID++))
+done
 
 
 
